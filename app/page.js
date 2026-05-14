@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const orders = [
   { id: "DD-20260514-001", customer: "上海辰野科技", amount: "¥18,240", status: "已完成", createdAt: "2026-05-14 09:18", owner: "林静" },
@@ -12,6 +12,7 @@ const orders = [
 ];
 
 const navItems = ["总览", "用户", "订单", "商品", "设置"];
+const pageSize = 3;
 const chartBars = [
   { label: "一", value: "58%" },
   { label: "二", value: "74%" },
@@ -35,6 +36,7 @@ export default function Home() {
   const [loginHint, setLoginHint] = useState("演示账号已预填，可直接登录。");
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const filteredOrders = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -45,6 +47,25 @@ export default function Home() {
       return matchesKeyword && matchesStatus;
     });
   }, [keyword, status]);
+
+  const pageCount = Math.max(1, Math.ceil(filteredOrders.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, pageCount);
+  const pagedOrders = useMemo(() => {
+    const startIndex = (safeCurrentPage - 1) * pageSize;
+    return filteredOrders.slice(startIndex, startIndex + pageSize);
+  }, [filteredOrders, safeCurrentPage]);
+  const pageNumbers = useMemo(
+    () => Array.from({ length: pageCount }, (_, index) => index + 1),
+    [pageCount]
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [keyword, status]);
+
+  function goToPage(page) {
+    setCurrentPage(Math.min(Math.max(page, 1), pageCount));
+  }
 
   function handleLogin(event) {
     event.preventDefault();
@@ -132,7 +153,6 @@ export default function Home() {
                 <h2>运营总览</h2>
               </div>
               <div className="top-actions">
-                <button className="icon-btn" type="button" title="通知" aria-label="通知">!</button>
                 <div className="user-chip">
                   <span className="avatar" aria-hidden="true">A</span>
                   <span>管理员</span>
@@ -238,7 +258,7 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredOrders.map((order) => (
+                    {pagedOrders.map((order) => (
                       <tr key={order.id}>
                         <td>{order.id}</td>
                         <td>{order.customer}</td>
@@ -254,10 +274,31 @@ export default function Home() {
               <div className="table-footer">
                 <span>共 {filteredOrders.length} 条</span>
                 <div className="pager" aria-label="分页">
-                  <button type="button" disabled>上一页</button>
-                  <button type="button" className="is-active">1</button>
-                  <button type="button">2</button>
-                  <button type="button">下一页</button>
+                  <button
+                    type="button"
+                    disabled={safeCurrentPage === 1}
+                    onClick={() => goToPage(safeCurrentPage - 1)}
+                  >
+                    上一页
+                  </button>
+                  {pageNumbers.map((page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      className={page === safeCurrentPage ? "is-active" : undefined}
+                      aria-current={page === safeCurrentPage ? "page" : undefined}
+                      onClick={() => goToPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    disabled={safeCurrentPage === pageCount}
+                    onClick={() => goToPage(safeCurrentPage + 1)}
+                  >
+                    下一页
+                  </button>
                 </div>
               </div>
             </section>
