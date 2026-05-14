@@ -32,7 +32,7 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [account, setAccount] = useState("admin@example.com");
   const [password, setPassword] = useState("admin123");
-  const [loginHint, setLoginHint] = useState("演示账号已预填，可直接登录。");
+  const [loginHint, setLoginHint] = useState("");
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState("all");
 
@@ -60,7 +60,7 @@ export default function Home() {
 
   function handleLogout() {
     setIsLoggedIn(false);
-    setLoginHint("演示账号已预填，可直接登录。");
+    setLoginHint("");
   }
 
   return (
@@ -105,7 +105,7 @@ export default function Home() {
                 <a href="#help">忘记密码</a>
               </div>
               <button className="primary-btn" type="submit">登录控制台</button>
-              <p className="form-hint">{loginHint}</p>
+              {loginHint && <p className="form-hint">{loginHint}</p>}
             </form>
           </div>
         </section>
