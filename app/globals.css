@@ -506,6 +506,11 @@ th {
   border-color: var(--primary);
 }
 
+.pager button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 @media (max-width: 980px) {
   .dashboard-view {
     grid-template-columns: 1fr;
