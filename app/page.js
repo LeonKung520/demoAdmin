@@ -125,7 +125,7 @@ export default function Home() {
                 </label>
                 <a href="#help">忘记密码</a>
               </div>
-              <button className="primary-btn" type="submit">登录控制台</button>
+              <button className="primary-btn" type="submit">登录</button>
               {loginHint && <p className="form-hint">{loginHint}</p>}
             </form>
           </div>
